@@ -9,6 +9,7 @@ import com.data_management.Patient;
  * relies on a {@link DataStorage} instance to access patient data and evaluate
  * it against specific health criteria.
  */
+
 public class AlertGenerator {
     // made field final so no changes occur after construction
     private final DataStorage dataStorage;
@@ -18,7 +19,8 @@ public class AlertGenerator {
      * The {@code DataStorage} is used to retrieve patient data that this class
      * will monitor and evaluate.
      * 
-     * improved formatting for readability
+     * Improved formatting for readability
+     * 
      * @param dataStorage the data storage system that provides access to patient data
      */
     public AlertGenerator(DataStorage dataStorage) {
@@ -28,8 +30,7 @@ public class AlertGenerator {
     /**
      * Evaluates the specified patient's data to determine if any alert conditions
      * are met. If a condition is met, an alert is triggered via the
-     * changed link to include method reference
-     * {@link #triggerAlert(Alert)}
+     * {@link #triggerAlert}
      * method. This method should define the specific conditions under which an
      * alert
      * will be triggered.
