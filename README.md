@@ -65,4 +65,9 @@ java -jar target/cardio_generator-1.0-SNAPSHOT.jar --patient-count 100 --output 
 ## Project Members
 - Student ID: 6414193
 
+## UML Models
+The UML class diagrams for the Cardiovascular Health Monitoring System (CHMS) are located in the `uml_models` directory.
+They include Data Generation System, Alert Generation System, Data Input System, Output System in a single pdf
+There is an explanation of the design decisions for each diagram in the explanations.md file.
+
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
