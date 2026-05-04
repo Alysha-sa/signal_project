@@ -33,9 +33,11 @@ public class BloodSaturationDataGenerator implements PatientDataGenerator {
     /**
      * Generates a new simulated blood oxygen saturation value for a given patient.
      * The value fluctuates slightly and is bounded between 90 and 100.
+     * Outputs the generated value via the provided outputStrategy.
      *
      * @param patientId identifier of the patient
      * @param outputStrategy strategy used to output the generated data
+     * @throws Exception for if an error occurs during generation
      */
 
     @Override

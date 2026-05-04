@@ -6,10 +6,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.Executors;
 
-    /**
-     * TCP-based implementation of {@link OutputStrategy}.
-     * Sends generated patient data over a TCP socket to a client.
-     */
+/**
+ * TCP-based implementation of {@link OutputStrategy}.
+ * Sends generated patient data over a TCP socket to a client.
+ */
 
 public class TcpOutputStrategy implements OutputStrategy {
 
@@ -23,6 +23,7 @@ public class TcpOutputStrategy implements OutputStrategy {
      * is not blocked.
      *
      * @param port the port number the TCP will use
+     * @throws IOException if the server socket cannot be created on the given port
      */
 
     public TcpOutputStrategy(int port) {
