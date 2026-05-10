@@ -3,6 +3,8 @@ package data_management;
 import com.data_management.DataStorage;
 import com.data_management.FileDataReader;
 import com.data_management.PatientRecord;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -18,6 +20,11 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class FileDataReaderTest {
 
+    @BeforeEach
+    void setUp() {
+        DataStorage.resetInstance();
+    }
+
     @TempDir
     Path tempDir;
 
@@ -30,7 +37,7 @@ class FileDataReaderTest {
             "Patient ID: 1, Timestamp: 1714376789051, Label: HeartRate, Data: 80.0\n"
         );
 
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         FileDataReader reader = new FileDataReader(tempDir.toString());
         reader.readData(storage);
 
@@ -49,7 +56,7 @@ class FileDataReaderTest {
             "Patient ID: 1, Timestamp: 1714376789050, Label: HeartRate, Data: 75.0\n"
         );
 
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         FileDataReader reader = new FileDataReader(tempDir.toString());
         reader.readData(storage);
 
@@ -60,7 +67,7 @@ class FileDataReaderTest {
 
     @Test
     void testReadData_directoryNotFound() {
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         FileDataReader reader = new FileDataReader("directory not found");
 
         assertThrows(IOException.class, () -> reader.readData(storage));
@@ -69,7 +76,7 @@ class FileDataReaderTest {
     // throw exception when empty directory
     @Test
     void testReadData_emptyDirectory() throws IOException {
-        DataStorage storage = new DataStorage();
+        DataStorage storage = DataStorage.getInstance();
         FileDataReader reader = new FileDataReader(tempDir.toString());
         reader.readData(storage);
 
