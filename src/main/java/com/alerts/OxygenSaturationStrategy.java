@@ -8,7 +8,8 @@ import java.util.stream.Collectors;
 
 /**
  * Strategy for checking alert conditions of blood oxygen saturation.
- * Checks for low saturation levels and critical drops within a short time window.
+ * Checks for low saturation levels and critical drops within a short 
+ * time window.
  */
 public class OxygenSaturationStrategy implements AlertStrategy {
 

@@ -4,6 +4,7 @@ import com.data_management.DataStorage;
 import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 public class AlertGenerator {
 
     private final DataStorage dataStorage;
+    private final List<Alert> triggeredAlerts = new ArrayList<>();
 
     /**
      * Constructs an {@code AlertGenerator} with the specified {@code DataStorage}.
@@ -281,8 +283,19 @@ public class AlertGenerator {
      * @param alert the alert containing details about the condition
      */
     private void triggerAlert(Alert alert) {
+        triggeredAlerts.add(alert);
         System.out.println("ALERT - Patient ID: " + alert.getPatientId()
             + ", Condition: " + alert.getCondition()
             + ", Timestamp: " + alert.getTimestamp());
     }
+
+    /**
+     * It returns all alerts that are triggered (used for testing)
+     *
+     * @return a list of all triggered alerts
+     */
+    public List<Alert> getTriggeredAlerts() {
+        return triggeredAlerts;
+    }
+
 }
