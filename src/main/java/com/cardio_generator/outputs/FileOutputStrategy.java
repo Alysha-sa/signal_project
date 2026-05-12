@@ -19,7 +19,7 @@ public class FileOutputStrategy implements OutputStrategy {
      * Base directory where output files are stored.
      */
 
-    // changed the variable name to lowerCamelCase
+    // changed the variable name to lowerCamelCase to match Google Java Style Guide
     // made field final so no changes occur after construction
     private final String baseDirectory;
 
@@ -28,7 +28,7 @@ public class FileOutputStrategy implements OutputStrategy {
      */
 
     // changed to private field
-    // changed variable name to lowerCamelCase
+    // changed variable name to lowerCamelCase to match Google Java Style Guide
     private final ConcurrentHashMap<String, String> fileMap = new ConcurrentHashMap<>();
 
     /**
@@ -37,11 +37,10 @@ public class FileOutputStrategy implements OutputStrategy {
      * @param baseDirectory directory where output files will be stored
      */
 
-    // updated the constructor name to UpperCamelCase
-    // updated the variable to lowerCamelCase
+    // changed the constructor name to UpperCamelCase to match Google Java Style Guide
     public FileOutputStrategy(String baseDirectory) {
 
-        // updated variable name to lowerCamelCase
+        // updated variable name to lowerCamelCase to match Google Java Style Guide
         this.baseDirectory = baseDirectory;
     }
 
@@ -59,24 +58,24 @@ public class FileOutputStrategy implements OutputStrategy {
     public void output(int patientId, long timestamp, String label, String data) {
         try {
             // Create the directory
-            // updated variable name to lowerCamelCase
+            // updated variable name to lowerCamelCase to match Google Java Style Guide
             Files.createDirectories(Paths.get(baseDirectory));
         } catch (IOException e) {
             System.err.println("Error creating base directory: " + e.getMessage());
             return;
         }
         // Set the FilePath variable
-        // update variable names to lowerCamelCase
-        // change variable name to lowerCamelCase
+        // update variable names to lowerCamelCase to match Google Java Style Guide
+        // change variable name to lowerCamelCase to match Google Java Style Guide
         String filePath = fileMap.computeIfAbsent(label, k -> Paths.get(baseDirectory, label + ".txt").toString()); 
 
         // Write the data to the file
         try (PrintWriter out = new PrintWriter(
-                // updated variable name to match lowerCamelCase
+                // updated variable name to match lowerCamelCase to match Google Java Style Guide
                 Files.newBufferedWriter(Paths.get(filePath), StandardOpenOption.CREATE, StandardOpenOption.APPEND))) {
             out.printf("Patient ID: %d, Timestamp: %d, Label: %s, Data: %s%n", patientId, timestamp, label, data);
         } catch (Exception e) {
-            // change variable name to lowerCamelCase
+            // change variable name to lowerCamelCase to match Google Java Style Guide
             System.err.println("Error writing to file " + filePath + ": " + e.getMessage());
         }
     }

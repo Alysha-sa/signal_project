@@ -22,7 +22,7 @@ public class AlertGenerator implements PatientDataGenerator {
      * {@code true} means alert is active (triggered).
      * {@code false} means no active alert (resolved).
      */
-    private boolean[] alertState; // renamed to lowerCamelCase
+    private boolean[] alertState; // changed variable name to lowerCamelCase to match Google Java Style Guide
 
     /**
      * Creates an {@code AlertGenerator} for the given number of patients.
@@ -59,6 +59,7 @@ public class AlertGenerator implements PatientDataGenerator {
                 }
             } else {
                 double lambda = 0.1; // Average rate (alerts per period), adjust based on desired frequency
+                                     // changed variable name to lowerCamelCase to match Google Java Style Guide
                 double p = -Math.expm1(-lambda); // Probability of at least one alert in the period
                 boolean alertTriggered = randomGenerator.nextDouble() < p;
 
