@@ -1,10 +1,13 @@
 package data_management;
 
+import com.alerts.Alert;
 import com.alerts.AlertGenerator;
 import com.data_management.DataStorage;
 import com.data_management.Patient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,8 +40,13 @@ class AlertGeneratorTest {
         storage.addPatientData(1, 130.0, "SystolicPressure", 3000L);
 
         Patient patient = storage.getAllPatients().get(0);
-        // should not throw, alert is printed to console
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        List<Alert> alerts = alertGenerator.getTriggeredAlerts();
+        assertTrue(
+            alerts.stream().anyMatch(a -> a.getCondition().contains("Increasing Trend")),
+            "Expected a systolic increasing trend alert"
+        );
     }
 
     @Test
@@ -48,7 +56,13 @@ class AlertGeneratorTest {
         storage.addPatientData(1, 100.0, "SystolicPressure", 3000L);
 
         Patient patient = storage.getAllPatients().get(0);
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        List<Alert> alerts = alertGenerator.getTriggeredAlerts();
+        assertTrue(
+            alerts.stream().anyMatch(a -> a.getCondition().contains("Decreasing Trend")),
+            "Expected a systolic decreasing trend alert"
+        );
     }
 
     @Test
@@ -56,7 +70,15 @@ class AlertGeneratorTest {
         storage.addPatientData(1, 185.0, "SystolicPressure", 1000L);
 
         Patient patient = storage.getAllPatients().get(0);
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        List<Alert> alerts = alertGenerator.getTriggeredAlerts();
+        assertTrue(
+            alerts.stream().anyMatch(a ->
+                a.getCondition().contains("Critical Systolic Pressure High")
+                && a.getCondition().contains("Blood Pressure Alert")),
+            "Expected a critical high systolic blood pressure alert"
+        );
     }
 
     @Test
@@ -64,7 +86,15 @@ class AlertGeneratorTest {
         storage.addPatientData(1, 85.0, "SystolicPressure", 1000L);
 
         Patient patient = storage.getAllPatients().get(0);
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        List<Alert> alerts = alertGenerator.getTriggeredAlerts();
+        assertTrue(
+            alerts.stream().anyMatch(a ->
+                a.getCondition().contains("Critical Systolic Pressure Low")
+                && a.getCondition().contains("Blood Pressure Alert")),
+            "Expected a critical low systolic blood pressure alert"
+        );
     }
 
     @Test
@@ -72,7 +102,15 @@ class AlertGeneratorTest {
         storage.addPatientData(1, 125.0, "DiastolicPressure", 1000L);
 
         Patient patient = storage.getAllPatients().get(0);
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        List<Alert> alerts = alertGenerator.getTriggeredAlerts();
+        assertTrue(
+            alerts.stream().anyMatch(a ->
+                a.getCondition().contains("Critical Diastolic Pressure High")
+                && a.getCondition().contains("Blood Pressure Alert")),
+            "Expected a critical high diastolic blood pressure alert"
+        );
     }
 
     @Test
@@ -80,7 +118,15 @@ class AlertGeneratorTest {
         storage.addPatientData(1, 55.0, "DiastolicPressure", 1000L);
 
         Patient patient = storage.getAllPatients().get(0);
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        List<Alert> alerts = alertGenerator.getTriggeredAlerts();
+        assertTrue(
+            alerts.stream().anyMatch(a ->
+                a.getCondition().contains("Critical Diastolic Pressure Low")
+                && a.getCondition().contains("Blood Pressure Alert")),
+            "Expected a critical low diastolic blood pressure alert"
+        );
     }
 
     //Blood Saturation Tests
@@ -89,7 +135,15 @@ class AlertGeneratorTest {
         storage.addPatientData(1, 91.0, "Saturation", 1000L);
 
         Patient patient = storage.getAllPatients().get(0);
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        List<Alert> alerts = alertGenerator.getTriggeredAlerts();
+        assertTrue(
+            alerts.stream().anyMatch(a ->
+                a.getCondition().contains("Low Blood Saturation")
+                && a.getCondition().contains("Blood Oxygen Alert")),
+            "Expected a low blood saturation alert"
+        );
     }
 
     @Test
@@ -99,7 +153,15 @@ class AlertGeneratorTest {
         storage.addPatientData(1, 93.0, "Saturation", 300000L);
 
         Patient patient = storage.getAllPatients().get(0);
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        List<Alert> alerts = alertGenerator.getTriggeredAlerts();
+        assertTrue(
+            alerts.stream().anyMatch(a ->
+                a.getCondition().contains("Quick Blood Saturation Drop")
+                && a.getCondition().contains("Blood Oxygen Alert")),
+            "Expected a rapid blood saturation drop alert"
+        );
     }
 
     @Test
@@ -108,7 +170,11 @@ class AlertGeneratorTest {
         storage.addPatientData(1, 97.0, "Saturation", 2000L);
 
         Patient patient = storage.getAllPatients().get(0);
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        assertTrue(alertGenerator.getTriggeredAlerts().isEmpty(),
+            "Expected no alerts for normal saturation values"
+        );
     }
 
     //Hypotensive Hypoxemia Tests
@@ -118,7 +184,13 @@ class AlertGeneratorTest {
         storage.addPatientData(1, 91.0, "Saturation", 1000L);
 
         Patient patient = storage.getAllPatients().get(0);
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        List<Alert> alerts = alertGenerator.getTriggeredAlerts();
+        assertTrue(
+            alerts.stream().anyMatch(a -> a.getCondition().contains("Hypotensive Hypoxemia")),
+            "Should trigger combined alert"
+        );
     }
 
     @Test
@@ -128,7 +200,13 @@ class AlertGeneratorTest {
         storage.addPatientData(1, 97.0, "Saturation", 1000L);
 
         Patient patient = storage.getAllPatients().get(0);
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        boolean hasHypoxemiaAlert = alertGenerator.getTriggeredAlerts().stream()
+            .anyMatch(a -> a.getCondition().contains("Hypotensive Hypoxemia"));
+        assertFalse(hasHypoxemiaAlert,
+            "Should not trigger combined alert when only Blood Pressure is low"
+        );
     }
 
     //ECG Tests
@@ -142,7 +220,15 @@ class AlertGeneratorTest {
         storage.addPatientData(1, 3.0, "ECG", 1100L);
 
         Patient patient = storage.getAllPatients().get(0);
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        List<Alert> alerts = alertGenerator.getTriggeredAlerts();
+        assertTrue(
+            alerts.stream().anyMatch(a ->
+                a.getCondition().contains("Abnormal ECG Peak Detected")
+                && a.getCondition().contains("ECG Alert")),
+            "Expected an abnormal ECG peak alert"
+        );
     }
 
     @Test
@@ -152,7 +238,11 @@ class AlertGeneratorTest {
         }
 
         Patient patient = storage.getAllPatients().get(0);
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        boolean hasEcgAlert = alertGenerator.getTriggeredAlerts().stream()
+            .anyMatch(a -> a.getCondition().contains("ECG Alert"));
+        assertFalse(hasEcgAlert, "Expected no alert for normal ECG values");
     }
 
     //Triggered Alert Tests
@@ -162,7 +252,13 @@ class AlertGeneratorTest {
         storage.addPatientData(1, 1.0, "Alert", 1000L);
 
         Patient patient = storage.getAllPatients().get(0);
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        List<Alert> alerts = alertGenerator.getTriggeredAlerts();
+        assertTrue(
+            alerts.stream().anyMatch(a -> a.getCondition().contains("Manual Alert Triggered")),
+            "Expected a manual triggered alert"
+        );
     }
 
     @Test
@@ -171,6 +267,10 @@ class AlertGeneratorTest {
         storage.addPatientData(1, 0.0, "Alert", 1000L);
 
         Patient patient = storage.getAllPatients().get(0);
-        assertDoesNotThrow(() -> alertGenerator.evaluateData(patient));
+        alertGenerator.evaluateData(patient);
+
+        assertTrue(alertGenerator.getTriggeredAlerts().isEmpty(),
+            "Expected no alert when alert value is resolved(0.0)"
+        );
     }
 }

@@ -35,10 +35,31 @@ import java.util.ArrayList;
 
 public class HealthDataSimulator {
 
+    private static HealthDataSimulator instance;
+
     private static int patientCount = 50; // Default number of patients
     private static ScheduledExecutorService scheduler;
     private static OutputStrategy outputStrategy = new ConsoleOutputStrategy(); // Default output strategy
     private static final Random random = new Random();
+
+    /**
+     * private constructor (prevents direct instantiation)
+     * use {@link #getInstance()} for instatiation
+     */
+    private HealthDataSimulator() {
+    }
+
+    /**
+     * Returns the shared instance of HealthDataSimulator, and if it does not exist yet it creates one
+     * 
+     * @return a singleton instance (of HealthDataSimulator)
+     */
+    public static HealthDataSimulator getInstance() {
+        if (instance == null) {
+            instance = new HealthDataSimulator();
+        }
+        return instance;
+    }
 
     /**
      * The main method that starts the health data simulation.
@@ -49,7 +70,18 @@ public class HealthDataSimulator {
      * @throws IOException if an error occurs while creating output directories
      */
     public static void main(String[] args) throws IOException {
+        // uses singleton instance for the simulation
+        HealthDataSimulator simulator = getInstance();
+        simulator.run(args);
+    }
 
+    /**
+     * Runs simulator wihth provided arguments
+     * 
+     * @param args the command-line arguments that are being parsed
+     * @throws IOException throws an error when one occurs while creating output directories
+     */
+    public void run(String[] args) throws IOException {
         parseArguments(args);
 
         scheduler = Executors.newScheduledThreadPool(patientCount * 4);

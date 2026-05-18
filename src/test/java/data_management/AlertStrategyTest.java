@@ -1,5 +1,6 @@
 package data_management;
 
+import com.alerts.Alert;
 import com.alerts.AlertGenerator;
 import com.alerts.BloodPressureStrategy;
 import com.alerts.HeartRateStrategy;
@@ -19,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class AlertStrategyTest {
 
     private DataStorage storage;
-    private AlertGenerator alertGenerator;
 
     @BeforeEach
     void setUp() {
@@ -35,8 +35,15 @@ class AlertStrategyTest {
         List<com.data_management.PatientRecord> records =
             storage.getRecords(1, 0, Long.MAX_VALUE);
 
-        assertDoesNotThrow(() ->
-            new BloodPressureStrategy().checkAlert(patient, records));
+        List<Alert> triggered = new java.util.ArrayList<>();
+        new BloodPressureStrategy().checkAlert(patient, records, triggered::add);
+
+        assertTrue(
+            triggered.stream().anyMatch(a ->
+                a.getCondition().contains("Critical Systolic Pressure High")
+                && a.getCondition().contains("Blood Pressure Alert")),
+            "Expected a critical high systolic alert"
+        );
     }
 
     @Test
@@ -46,8 +53,15 @@ class AlertStrategyTest {
         List<com.data_management.PatientRecord> records =
             storage.getRecords(1, 0, Long.MAX_VALUE);
 
-        assertDoesNotThrow(() ->
-            new BloodPressureStrategy().checkAlert(patient, records));
+        List<Alert> triggered = new java.util.ArrayList<>();
+        new BloodPressureStrategy().checkAlert(patient, records, triggered::add);
+
+        assertTrue(
+            triggered.stream().anyMatch(a ->
+                a.getCondition().contains("Critical Systolic Pressure Low")
+                && a.getCondition().contains("Blood Pressure Alert")),
+            "Expected a critical low systolic alert"
+        );
     }
 
     @Test
@@ -59,8 +73,13 @@ class AlertStrategyTest {
         List<com.data_management.PatientRecord> records =
             storage.getRecords(1, 0, Long.MAX_VALUE);
 
-        assertDoesNotThrow(() ->
-            new BloodPressureStrategy().checkAlert(patient, records));
+        List<Alert> triggered = new java.util.ArrayList<>();
+        new BloodPressureStrategy().checkAlert(patient, records, triggered::add);
+
+        assertTrue(
+            triggered.stream().anyMatch(a -> a.getCondition().contains("Increasing Trend")),
+            "Expected a systolic increasing trend alert"
+        );
     }
 
     // Oxygen Saturation Strategy
@@ -71,8 +90,15 @@ class AlertStrategyTest {
         List<com.data_management.PatientRecord> records =
             storage.getRecords(1, 0, Long.MAX_VALUE);
 
-        assertDoesNotThrow(() ->
-            new OxygenSaturationStrategy().checkAlert(patient, records));
+        List<Alert> triggered = new java.util.ArrayList<>();
+        new OxygenSaturationStrategy().checkAlert(patient, records, triggered::add);
+
+        assertTrue(
+            triggered.stream().anyMatch(a ->
+                a.getCondition().contains("Low Blood Saturation")
+                && a.getCondition().contains("Blood Oxygen Alert")),
+            "Expected a low saturation alert"
+        );
     }
 
     @Test
@@ -83,8 +109,15 @@ class AlertStrategyTest {
         List<com.data_management.PatientRecord> records =
             storage.getRecords(1, 0, Long.MAX_VALUE);
 
-        assertDoesNotThrow(() ->
-            new OxygenSaturationStrategy().checkAlert(patient, records));
+        List<Alert> triggered = new java.util.ArrayList<>();
+        new OxygenSaturationStrategy().checkAlert(patient, records, triggered::add);
+
+        assertTrue(
+            triggered.stream().anyMatch(a ->
+                a.getCondition().contains("Quick Blood Saturation Drop")
+                && a.getCondition().contains("Blood Oxygen Alert")),
+            "Expected a rapid saturation drop alert"
+        );
     }
 
     // Heart Rate Strategy
@@ -93,13 +126,21 @@ class AlertStrategyTest {
         for (int i = 0; i < 10; i++) {
             storage.addPatientData(1, 1.0, "ECG", i * 100L);
         }
+        // spike: 3.0 is more than 1.5x average of 1.0
         storage.addPatientData(1, 3.0, "ECG", 1100L);
         Patient patient = storage.getAllPatients().get(0);
         List<com.data_management.PatientRecord> records =
             storage.getRecords(1, 0, Long.MAX_VALUE);
 
-        assertDoesNotThrow(() ->
-            new HeartRateStrategy().checkAlert(patient, records));
+        List<Alert> triggered = new java.util.ArrayList<>();
+        new HeartRateStrategy().checkAlert(patient, records, triggered::add);
+
+        assertTrue(
+            triggered.stream().anyMatch(a ->
+                a.getCondition().contains("Abnormal ECG Peak Detected")
+                && a.getCondition().contains("ECG Alert")),
+            "Expected an abnormal ECG peak alert"
+        );
     }
 
     @Test
@@ -109,8 +150,12 @@ class AlertStrategyTest {
         List<com.data_management.PatientRecord> records =
             storage.getRecords(1, 0, Long.MAX_VALUE);
 
+        List<Alert> triggered = new java.util.ArrayList<>();
         // should not throw even with insufficient records
-        assertDoesNotThrow(() ->
-            new HeartRateStrategy().checkAlert(patient, records));
+        new HeartRateStrategy().checkAlert(patient, records, triggered::add);
+
+        assertTrue(triggered.isEmpty(),
+            "Expected no alert when there are not enough ECG records"
+        );
     }
 }

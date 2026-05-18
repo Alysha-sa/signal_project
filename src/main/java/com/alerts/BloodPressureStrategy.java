@@ -4,6 +4,7 @@ import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -21,9 +22,10 @@ public class BloodPressureStrategy implements AlertStrategy {
      *
      * @param patient the patient being checked
      * @param records all records for this patient
+     * @param alertCallback a callback that accepts an alert when a condition is met
      */
     @Override
-    public void checkAlert(Patient patient, List<PatientRecord> records) {
+    public void checkAlert(Patient patient, List<PatientRecord> records, Consumer<Alert> alertCallback) {
         List<PatientRecord> systolic = records.stream()
             .filter(r -> r.getRecordType().equals("SystolicPressure"))
             .collect(Collectors.toList());
@@ -32,10 +34,10 @@ public class BloodPressureStrategy implements AlertStrategy {
             .filter(r -> r.getRecordType().equals("DiastolicPressure"))
             .collect(Collectors.toList());
 
-        checkThresholds(patient, systolic, 180, 90, "Systolic");
-        checkThresholds(patient, diastolic, 120, 60, "Diastolic");
-        checkTrend(patient, systolic, "Systolic");
-        checkTrend(patient, diastolic, "Diastolic");
+        checkThresholds(patient, systolic, 180, 90, "Systolic", alertCallback);
+        checkThresholds(patient, diastolic, 120, 60, "Diastolic", alertCallback);
+        checkTrend(patient, systolic, "Systolic", alertCallback);
+        checkTrend(patient, diastolic, "Diastolic", alertCallback);
     }
 
     /**
@@ -46,23 +48,25 @@ public class BloodPressureStrategy implements AlertStrategy {
      * @param high the high threshold
      * @param low the low threshold
      * @param type label showing systolic or diastolic
+     * @param alertCallback a callback that accepts an alert when a condition is met
      */
     private void checkThresholds(Patient patient, List<PatientRecord> records,
-                                  double high, double low, String type) {
+                                double high, double low, String type, Consumer<Alert> alertCallback) {
         for (PatientRecord record : records) {
             double value = record.getMeasurementValue();
             if (value > high) {
                 Alert alert = factory.createAlert(
                     String.valueOf(patient.getPatientId()),
-                    type + " pressure critically high: " + value,
+                    "Critical " + type + " Pressure High: " + value,
                     record.getTimestamp());
-                System.out.println("ALERT - " + alert.getCondition());
+                // wrap with priority decorator
+                alertCallback.accept(new PriorityAlertDecorator(alert, "HIGH"));
             } else if (value < low) {
                 Alert alert = factory.createAlert(
                     String.valueOf(patient.getPatientId()),
-                    type + " pressure critically low: " + value,
+                    "Critical " + type + " Pressure Low: " + value,
                     record.getTimestamp());
-                System.out.println("ALERT - " + alert.getCondition());
+                alertCallback.accept(new PriorityAlertDecorator(alert, "HIGH"));
             }
         }
     }
@@ -74,8 +78,9 @@ public class BloodPressureStrategy implements AlertStrategy {
      * @param patient the patient being checked
      * @param records the list of pressure records to check
      * @param type label indicating systolic or diastolic
+     * @param alertCallback a callback that accepts an alert when a condition is met
      */
-    private void checkTrend(Patient patient, List<PatientRecord> records, String type) {
+    private void checkTrend(Patient patient, List<PatientRecord> records, String type, Consumer<Alert> alertCallback) {
         if (records.size() < 3) return;
         for (int i = 2; i < records.size(); i++) {
             double first = records.get(i - 2).getMeasurementValue();
@@ -85,15 +90,15 @@ public class BloodPressureStrategy implements AlertStrategy {
             if (second - first > 10 && third - second > 10) { // threshold of 10 mmHg
                 Alert alert = factory.createAlert(
                     String.valueOf(patient.getPatientId()),
-                    type + " pressure increasing trend",
+                    type + " Blood Pressure Increasing Trend",
                     records.get(i).getTimestamp());
-                System.out.println("ALERT - " + alert.getCondition());
+                alertCallback.accept(alert);
             } else if (first - second > 10 && second - third > 10) {
                 Alert alert = factory.createAlert(
                     String.valueOf(patient.getPatientId()),
-                    type + " pressure decreasing trend",
+                    type + " Blood Pressure Decreasing Trend",
                     records.get(i).getTimestamp());
-                System.out.println("ALERT - " + alert.getCondition());
+                alertCallback.accept(alert);
             }
         }
     }

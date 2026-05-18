@@ -4,6 +4,7 @@ import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -22,9 +23,10 @@ public class HeartRateStrategy implements AlertStrategy {
      *
      * @param patient the patient being checked
      * @param records all records for this patient
+     * @param alertCallback a callback that accepts an alert when a condition is met
      */
     @Override
-    public void checkAlert(Patient patient, List<PatientRecord> records) {
+    public void checkAlert(Patient patient, List<PatientRecord> records, Consumer<Alert> alertCallback) {
         List<PatientRecord> ecgRecords = records.stream()
             .filter(r -> r.getRecordType().equals("ECG"))
             .collect(Collectors.toList());
@@ -43,9 +45,9 @@ public class HeartRateStrategy implements AlertStrategy {
             if (Math.abs(current) > Math.abs(average) * 1.5) {
                 Alert alert = factory.createAlert(
                     String.valueOf(patient.getPatientId()),
-                    "Abnormal ECG peak: " + current,
+                    "Abnormal ECG Peak Detected: " + current,
                     ecgRecords.get(i).getTimestamp());
-                System.out.println("ALERT - " + alert.getCondition());
+                alertCallback.accept(new RepeatedAlertDecorator(alert, 1));
             }
         }
     }

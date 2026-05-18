@@ -4,6 +4,7 @@ import com.data_management.Patient;
 import com.data_management.PatientRecord;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -21,9 +22,10 @@ public class OxygenSaturationStrategy implements AlertStrategy {
      *
      * @param patient the patient being checked
      * @param records all records for this patient
+     * @param alertCallback a callback that accepts an alert when a condition is met
      */
     @Override
-    public void checkAlert(Patient patient, List<PatientRecord> records) {
+    public void checkAlert(Patient patient, List<PatientRecord> records, Consumer<Alert> alertCallback) {
         List<PatientRecord> saturationRecords = records.stream()
             .filter(r -> r.getRecordType().equals("Saturation"))
             .collect(Collectors.toList());
@@ -36,9 +38,9 @@ public class OxygenSaturationStrategy implements AlertStrategy {
             if (value < 92) {
                 Alert alert = factory.createAlert(
                     String.valueOf(patient.getPatientId()),
-                    "Low saturation: " + value + "%",
+                    "Low Blood Saturation: " + value + "%",
                     current.getTimestamp());
-                System.out.println("ALERT - " + alert.getCondition());
+                alertCallback.accept(new PriorityAlertDecorator(alert, "HIGH"));
             }
 
             // quick drop alert within 10 minutes
@@ -50,9 +52,9 @@ public class OxygenSaturationStrategy implements AlertStrategy {
                     if (drop >= 5) {
                         Alert alert = factory.createAlert(
                             String.valueOf(patient.getPatientId()),
-                            "Rapid saturation drop: " + drop + "% in 10 minutes",
+                            "Quick Blood Saturation Drop: " + drop + "% in 10 minutes",
                             later.getTimestamp());
-                        System.out.println("ALERT - " + alert.getCondition());
+                        alertCallback.accept(alert);
                     }
                 } else {
                     break;
