@@ -103,7 +103,7 @@ public class FileDataReader implements DataReader {
             int patientId = Integer.parseInt(parts[0].split(": ")[1].trim());
             long timestamp = Long.parseLong(parts[1].split(": ")[1].trim());
             String label = parts[2].split(": ")[1].trim();
-            double value = Double.parseDouble(parts[3].split(": ")[1].trim());
+            double value = Double.parseDouble(parts[3].split(": ")[1].trim().replace("%", ""));
 
             dataStorage.addPatientData(patientId, value, label, timestamp);
 
